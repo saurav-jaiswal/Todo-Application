@@ -241,7 +241,6 @@
           icon: 'check',
           message: 'Task Updated Successfully'
         })
-        this.isUpdated = false
       },
     },
     filters: {
