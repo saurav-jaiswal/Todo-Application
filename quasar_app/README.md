@@ -10,7 +10,6 @@ https://todo-app-site.netlify.app/
 
 ![](src/assets/2.jpg)
 
-![](src/assets/4.jpg)
 
 ## Install the dependencies
 ```bash
