@@ -1,5 +1,6 @@
 <template>
-  <q-page padding>
+  <q-page >
+    <div class="q-pa-sm absolute full-width full-height column">
     <div class="typewriter text-center q-mb-lg q-mt-lg" v-if="$q.platform.is.desktop">
       <h1 class="text-bold">
         Todo Application
@@ -16,6 +17,7 @@
         <q-icon name="search"/>
       </template>
     </q-input>
+
     <q-banner class="bg-primary text-white" v-if="Object.keys(uncompletedTask).length == 0">
       No, Task to do Today !
       <template v-slot:action>
@@ -23,6 +25,8 @@
 
       </template>
     </q-banner>
+<q-scroll-area class="q-scroll-area-task" :thumb-style="thumbStyle"
+      :bar-style="barStyle">
     <transition
       appear
       enter-active-class="animated zoomIn"
@@ -106,12 +110,13 @@
         </q-list>
       </div>
     </transition>
+</q-scroll-area>
 
 
-    <div class="absolute-bottom text-center q-mb-lg">
+    <div class="fixed-bottom text-center no-pointer-events" style="bottom: 45px" >
 <!--      <q-btn icon="add" round color="primary" size="24px" @click="openAddTaskDialogBox"></q-btn>-->
-       <q-fab color="purple" icon="keyboard_arrow_up" direction="up">
-        <q-fab-action color="primary" @click="openAddTaskDialogBox" icon="add" />
+       <q-fab color="purple" icon="keyboard_arrow_up" direction="up" class="all-pointer-events">
+        <q-fab-action color="primary" @click="openAddTaskDialogBox" icon="add" class="all-pointer-events" />
       </q-fab>
 
     </div>
@@ -128,12 +133,12 @@
                      ref="name" label="Task Name"/>
           </div>
           <div class=" q-mb-sm">
-            <q-input outlined v-model="task.due_date" mask="date" ref="date"
+            <q-input :options="currentDate" outlined v-model="task.due_date" mask="date" ref="date"
                      :rules="[val => !!val || 'Date is required']" label="Date">
               <template v-slot:append>
                 <q-icon name="event" class="cursor-pointer">
                   <q-popup-proxy ref="due_date" transition-show="scale" transition-hide="scale">
-                    <q-date v-model="task.due_date" @input="() => $refs.due_date.hide()"/>
+                    <q-date :options="date => date >= new Date().toJSON().slice(0, 10).replace(/-/g, '/')" v-model="task.due_date" @input="() => $refs.due_date.hide()"/>
                   </q-popup-proxy>
                 </q-icon>
               </template>
@@ -145,8 +150,13 @@
             >
               <template v-slot:append>
                 <q-icon name="access_time" class="cursor-pointer">
-                  <q-popup-proxy transition-show="scale" transition-hide="scale">
-                    <q-time v-model="task.due_time"/>
+                  <q-popup-proxy transition-show="scale" transition-hide="scale" >
+                    <q-time v-model="task.due_time">
+                    <div class="row items-center justify-end q-gutter-sm">
+                      <q-btn label="Cancel" color="primary" flat v-close-popup/>
+                      <q-btn label="OK" color="primary" flat @click="save" v-close-popup/>
+                    </div>
+                    </q-time>
                   </q-popup-proxy>
                 </q-icon>
               </template>
@@ -164,7 +174,7 @@
       </q-card>
     </q-dialog>
     <!--    End Add Task Dialog Box-->
-  </q-page>
+ </div> </q-page>
 </template>
 
 <script>
@@ -177,12 +187,36 @@
         task: {selected: false},
         task_details: [],
         isUpdated: false,
-        filter: ''
+        filter: '',
+        thumbStyle: {
+          right: '4px',
+          borderRadius: '5px',
+          backgroundColor: '#027be3',
+          width: '5px',
+          opacity: 0.75
+        },
+
+        barStyle: {
+          right: '2px',
+          borderRadius: '9px',
+          backgroundColor: '#027be3',
+          width: '9px',
+          opacity: 0.2
+        }
       }
     },
     methods: {
+      currentDate() {
+
+        let formatted_date = new Date().toJSON().slice(0, 10).replace(/-/g, '/');
+        return formatted_date
+
+      },
       openAddTaskDialogBox() {
         this.addTaskDialogBox = true
+      },
+      save() {
+        this.time = this.task
       },
       saveTask() {
         this.$refs.name.validate()
@@ -218,7 +252,7 @@
         }).onOk(() => {
           let index = this.task_details.indexOf(row)
           if (index !== -1) {
-            this.task_details.splice(index, 1)
+            this.task_details.splice(index, 1);
           }
         })
       },
@@ -246,7 +280,7 @@
     },
     filters: {
       niceDate(value) {
-        return date.formatDate(value, 'MMM D')
+        return date.formatDate(value, 'MMM D YYYY')
       }
     },
     computed: {
@@ -267,7 +301,7 @@
         })
         return temp_search
       }
-    }
+    },
   }
 </script>
 
@@ -315,5 +349,9 @@
     50% {
       border-color: orange
     }
+  }
+  .q-scroll-area-task{
+    display: flex;
+    flex-grow: 1;
   }
 </style>
