@@ -116,7 +116,7 @@
 
     </div>
     <!--Add Task Dialog Box-->
-    <q-dialog v-model="addTaskDialogBox">
+    <q-dialog v-model="addTaskDialogBox" persistent>
       <q-card style="width: 100%">
         <q-card-section class="row">
           <div class="text-h6">Add Task</div>
@@ -241,6 +241,7 @@
           icon: 'check',
           message: 'Task Updated Successfully'
         })
+        this.isUpdated = false
       },
     },
     filters: {
